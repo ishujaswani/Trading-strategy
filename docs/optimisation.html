@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Trading - Optimisation</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Trading</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html" rel="" target="">
+ <span class="menu-text">Data Cleaning</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./optimisation.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Optimisation</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://code.com">
+            Source Code
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item quarto-navbar-tools ms-auto-item" href="https://bugs.com">
+            Report a Bug
+            </a>
+          </li>
+      </ul>
+    </div>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#factors" id="toc-factors" class="nav-link active" data-scroll-target="#factors">Factors</a>
+  <ul class="collapse">
+  <li><a href="#factor-exposures-and-factor-returns" id="toc-factor-exposures-and-factor-returns" class="nav-link" data-scroll-target="#factor-exposures-and-factor-returns">Factor Exposures and Factor Returns</a>
+  <ul class="collapse">
+  <li><a href="#helpful-code-to-show-how-to-get-x-f-d-matrices" id="toc-helpful-code-to-show-how-to-get-x-f-d-matrices" class="nav-link" data-scroll-target="#helpful-code-to-show-how-to-get-x-f-d-matrices">Helpful code to show how to get X, F, D matrices</a></li>
+  <li><a href="#problem-0" id="toc-problem-0" class="nav-link" data-scroll-target="#problem-0">problem 0</a></li>
+  <li><a href="#problem-1.-residual-returns" id="toc-problem-1.-residual-returns" class="nav-link" data-scroll-target="#problem-1.-residual-returns">Problem 1. Residual Returns</a></li>
+  <li><a href="#problem-2.-model-selection" id="toc-problem-2.-model-selection" class="nav-link" data-scroll-target="#problem-2.-model-selection">Problem 2. Model Selection</a></li>
+  </ul></li>
+  <li><a href="#part-1" id="toc-part-1" class="nav-link" data-scroll-target="#part-1">Part 1</a></li>
+  </ul></li>
+  <li><a href="#model-1-lasso" id="toc-model-1-lasso" class="nav-link" data-scroll-target="#model-1-lasso">Model 1 lasso</a></li>
+  <li><a href="#model-2-elasticnet" id="toc-model-2-elasticnet" class="nav-link" data-scroll-target="#model-2-elasticnet">model 2 ElasticNet</a></li>
+  <li><a href="#model-3---hypertuned-xgboost" id="toc-model-3---hypertuned-xgboost" class="nav-link" data-scroll-target="#model-3---hypertuned-xgboost">model 3 - Hypertuned XGBOOST</a>
+  <ul class="collapse">
+  <li><a href="#problem-3.-efficient-portfolio-optimization" id="toc-problem-3.-efficient-portfolio-optimization" class="nav-link" data-scroll-target="#problem-3.-efficient-portfolio-optimization">Problem 3. Efficient Portfolio Optimization</a></li>
+  <li><a href="#markowitz-model-mathematical-foundation" id="toc-markowitz-model-mathematical-foundation" class="nav-link" data-scroll-target="#markowitz-model-mathematical-foundation">Markowitz Model: Mathematical Foundation</a>
+  <ul class="collapse">
+  <li><a href="#objective" id="toc-objective" class="nav-link" data-scroll-target="#objective">Objective</a></li>
+  <li><a href="#variables" id="toc-variables" class="nav-link" data-scroll-target="#variables">Variables</a></li>
+  <li><a href="#expected-portfolio-return" id="toc-expected-portfolio-return" class="nav-link" data-scroll-target="#expected-portfolio-return">Expected Portfolio Return</a></li>
+  <li><a href="#portfolio-variance-risk" id="toc-portfolio-variance-risk" class="nav-link" data-scroll-target="#portfolio-variance-risk">Portfolio Variance (Risk)</a></li>
+  <li><a href="#optimization-problem" id="toc-optimization-problem" class="nav-link" data-scroll-target="#optimization-problem">Optimization Problem</a></li>
+  <li><a href="#solution" id="toc-solution" class="nav-link" data-scroll-target="#solution">Solution</a></li>
+  <li><a href="#mean-variance-formulation" id="toc-mean-variance-formulation" class="nav-link" data-scroll-target="#mean-variance-formulation">Mean-Variance Formulation</a></li>
+  </ul></li>
+  <li><a href="#woodbury-matrix-inversion-lemma" id="toc-woodbury-matrix-inversion-lemma" class="nav-link" data-scroll-target="#woodbury-matrix-inversion-lemma">Woodbury Matrix Inversion Lemma</a></li>
+  <li><a href="#application-in-portfolio-optimization" id="toc-application-in-portfolio-optimization" class="nav-link" data-scroll-target="#application-in-portfolio-optimization">Application in Portfolio Optimization</a>
+  <ul class="collapse">
+  <li><a href="#in-the-portfolio-context" id="toc-in-the-portfolio-context" class="nav-link" data-scroll-target="#in-the-portfolio-context">In the Portfolio Context</a></li>
+  <li><a href="#efficient-inverse-calculation" id="toc-efficient-inverse-calculation" class="nav-link" data-scroll-target="#efficient-inverse-calculation">Efficient Inverse Calculation</a></li>
+  <li><a href="#problem-4.-putting-it-all-together" id="toc-problem-4.-putting-it-all-together" class="nav-link" data-scroll-target="#problem-4.-putting-it-all-together">Problem 4. Putting it All Together</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#daily-returns-and-market-analysis-using-optimal-weights-markowitz-theory" id="toc-daily-returns-and-market-analysis-using-optimal-weights-markowitz-theory" class="nav-link" data-scroll-target="#daily-returns-and-market-analysis-using-optimal-weights-markowitz-theory">Daily returns and Market Analysis using optimal weights (Markowitz Theory)</a>
+  <ul class="collapse">
+  <li><a href="#plotting-the-daily-returns-and-market-analysis" id="toc-plotting-the-daily-returns-and-market-analysis" class="nav-link" data-scroll-target="#plotting-the-daily-returns-and-market-analysis">Plotting the daily returns and Market Analysis</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Optimisation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="factors" class="level1">
+<h1>Factors</h1>
+<section id="factor-exposures-and-factor-returns" class="level2">
+<h2 class="anchored" data-anchor-id="factor-exposures-and-factor-returns">Factor Exposures and Factor Returns</h2>
+<p>Arbitrage pricing theory relaxes several of the assumptions made in the course of deriving the CAPM. In particular, we relax the assumption that all investors do the same optimization and hence that there is a single efficient fund. This allows the possibility that a CAPM-like relation may hold, but with multiple underlying sources of risk.</p>
+<p>Specifically, let <span class="math inline">\(r_i, i = 1, \ldots, n\)</span> denote the cross-section of asset returns over a given time period <span class="math inline">\([t, t+1]\)</span>. In a fully-general model, the multivariate distribution <span class="math inline">\(p(r)\)</span> could have arbitrary covariance and higher-moment structures, but remember that for <span class="math inline">\(n\)</span> large there is typically never enough data to estimate such over-parameterized models.</p>
+<p>Instead, we assume a structural model which is the most direct generalization of the CAPM:</p>
+<p><span class="math display">\[ r_i = \beta_{i,1} f_1 + \beta_{i,2} f_2 + \cdots + \beta_{i,p} f_p + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma_i^2) \]</span></p>
+<p>If <span class="math inline">\(p = 1\)</span>, this reduces to the Capital Asset Pricing Model (CAPM) in a rather direct way.</p>
+<p>With <span class="math inline">\(p &gt; 1\)</span>, the model starts to differ from the CAPM in several very important aspects. In the CAPM, we were able to identify the single efficient fund by arguing that its weights must equal the market-capitalization weights. Hence we were given for free a very nice proxy for the single efficient fund: a capitalization-weighted basket such as the Russell 3000. Hence in the <span class="math inline">\(p = 1\)</span> case we had a convenient proxy which could be used to impute the return <span class="math inline">\(f_1\)</span>, which we called <span class="math inline">\(r_M\)</span>. Also <span class="math inline">\(\beta_{i,1}\)</span> could be estimated, with no more than the usual statistical estimation error, by time-series regression.</p>
+<p>If <span class="math inline">\(p &gt; 1\)</span> then the underlying assumptions of that argument break down: there is no longer any simple way to identify <span class="math inline">\(f_j\)</span> nor <span class="math inline">\(\beta_{i,j}\)</span> (for <span class="math inline">\(j = 1, \ldots, p\)</span>). We shall return to the estimation problem in due course.</p>
+<p>To avoid confusion with the CAPM, and its simplistic <span class="math inline">\(\beta\)</span> coefficient (which is still sometimes used in larger multi-factor models), it is conventional to make the following notation change: <span class="math inline">\(\beta_{i,j}\)</span> becomes <span class="math inline">\(X_{i,j}\)</span> and so the model equation becomes</p>
+<p><span class="math display">\[ r_i = X_{i,1} f_1 + X_{i,2} f_2 + \cdots + X_{i,p} f_p + \epsilon_i, \quad \epsilon_i \sim N(0, \sigma_i^2) \]</span></p>
+<p>It’s difficult to simultaneously estimate both all components <span class="math inline">\(X_{i,j}\)</span> and all risk-source returns <span class="math inline">\(f_j\)</span>, so one usually assumes one is known and calculates the other via regression. In what follows, we focus on the approach where <span class="math inline">\(X\)</span> is known, and the <span class="math inline">\(f_j\)</span> are assumed to be hidden (aka latent) variables.</p>
+<p>The structural equation is more conveniently expressed in matrix form:</p>
+<p><span class="math display">\[ R_{t+1} = X_t f_{t+1} + \epsilon_{t+1}, \quad E[\epsilon] = 0, \quad V[\epsilon] = D \]</span></p>
+<p>where <span class="math inline">\(R_{t+1}\)</span> is an <span class="math inline">\(n\)</span>-dimensional random vector containing the cross-section of returns in excess of the risk-free rate over some time interval <span class="math inline">\([t, t + 1]\)</span>, and <span class="math inline">\(X_t\)</span> is a (non-random) <span class="math inline">\(n \times p\)</span> matrix that can be calculated entirely from data known before time <span class="math inline">\(t\)</span>. The variable <span class="math inline">\(f\)</span> denotes a <span class="math inline">\(p\)</span>-dimensional random vector process which cannot be observed directly.</p>
+<p>Since the variable <span class="math inline">\(f\)</span> denotes a <span class="math inline">\(p\)</span>-dimensional random vector process which cannot be observed directly, information about the <span class="math inline">\(f\)</span>-process must be obtained via statistical inference. We assume that the <span class="math inline">\(f\)</span>-process has finite first and second moments given by</p>
+<p><span class="math display">\[ E[f] = \mu_f, \quad V[f] = F \]</span></p>
+<p>The primary outputs of a statistical inference process are the parameters <span class="math inline">\(\mu_f\)</span> and <span class="math inline">\(F\)</span>, and other outputs one might be interested in include estimates of the daily realizations <span class="math inline">\(\hat{f}_{t+1}\)</span>.</p>
+<p>The simplest way of estimating historical daily realizations of <span class="math inline">\(\hat{f}_{t+1}\)</span> is by least-squares (ordinary or weighted, as appropriate), viewing the defining model equation as a regression problem.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sort_cols(test):</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(test.reindex(<span class="bu">sorted</span>(test.columns), axis<span class="op">=</span><span class="dv">1</span>))</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming model is in the same directory as the python file</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># update data from 2003 to 2010</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>frames <span class="op">=</span> {}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> [<span class="dv">2003</span>,<span class="dv">2004</span>,<span class="dv">2005</span>,<span class="dv">2006</span>,<span class="dv">2007</span>,<span class="dv">2008</span>,<span class="dv">2009</span>,<span class="dv">2010</span>]:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    fil <span class="op">=</span> <span class="st">"pickle_data/FACTOR_MODEL/"</span> <span class="op">+</span> <span class="st">"pandas-frames."</span> <span class="op">+</span> <span class="bu">str</span>(year) <span class="op">+</span> <span class="st">".pickle.bz2"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    frames.update(pd.read_pickle(fil))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> frames: </span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    frames[x] <span class="op">=</span> sort_cols(frames[x])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming model is in the same directory as the python file</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># update data from 2003 to 2010</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>covariance <span class="op">=</span> {}</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> [<span class="dv">2003</span>,<span class="dv">2004</span>,<span class="dv">2005</span>,<span class="dv">2006</span>,<span class="dv">2007</span>,<span class="dv">2008</span>,<span class="dv">2009</span>,<span class="dv">2010</span>]:</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    fil <span class="op">=</span>  <span class="st">"pickle_data/FACTOR_MODEL/"</span> <span class="op">+</span> <span class="st">"covariance."</span> <span class="op">+</span> <span class="bu">str</span>(year) <span class="op">+</span> <span class="st">".pickle.bz2"</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    covariance.update(pd.read_pickle(fil))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> patsy</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> wins(x, a, b):</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span>(np.where(x <span class="op">&lt;=</span> a, a, np.where(x <span class="op">&gt;=</span> b, b, x)))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clean_nas(df):</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    numeric_columns <span class="op">=</span> df.select_dtypes(include<span class="op">=</span>[np.number]).columns.tolist()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> numeric_column <span class="kw">in</span> numeric_columns:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        df[numeric_column] <span class="op">=</span> np.nan_to_num(df[numeric_column])</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>industry_factors <span class="op">=</span> [<span class="st">'AERODEF'</span>, <span class="st">'AIRLINES'</span>, <span class="st">'ALUMSTEL'</span>, <span class="st">'APPAREL'</span>, <span class="st">'AUTO'</span>, <span class="st">'BANKS'</span>, <span class="st">'BEVTOB'</span>, </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">'BIOLIFE'</span>, <span class="st">'BLDGPROD'</span>, <span class="st">'CHEM'</span>, <span class="st">'CNSTENG'</span>, <span class="st">'CNSTMACH'</span>, <span class="st">'CNSTMATL'</span>, <span class="st">'COMMEQP'</span>, <span class="st">'COMPELEC'</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="st">'COMSVCS'</span>, <span class="st">'CONGLOM'</span>, <span class="st">'CONTAINR'</span>, <span class="st">'DISTRIB'</span>, <span class="st">'DIVFIN'</span>, <span class="st">'ELECEQP'</span>, <span class="st">'ELECUTIL'</span>, <span class="st">'FOODPROD'</span>, </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="st">'FOODRET'</span>, <span class="st">'GASUTIL'</span>, <span class="st">'HLTHEQP'</span>, <span class="st">'HLTHSVCS'</span>, <span class="st">'HOMEBLDG'</span>, <span class="st">'HOUSEDUR'</span>, <span class="st">'INDMACH'</span>, <span class="st">'INSURNCE'</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="st">'LEISPROD'</span>, <span class="st">'LEISSVCS'</span>, <span class="st">'LIFEINS'</span>, <span class="st">'MEDIA'</span>, <span class="st">'MGDHLTH'</span>, <span class="st">'MULTUTIL'</span>, <span class="st">'OILGSCON'</span>, <span class="st">'OILGSDRL'</span>, </span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="st">'OILGSEQP'</span>, <span class="st">'OILGSEXP'</span>, <span class="st">'PAPER'</span>, <span class="st">'PHARMA'</span>, <span class="st">'PRECMTLS'</span>, <span class="st">'PSNLPROD'</span>, <span class="st">'REALEST'</span>, <span class="st">'RESTAUR'</span>, </span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="st">'ROADRAIL'</span>, <span class="st">'SEMICOND'</span>, <span class="st">'SEMIEQP'</span>, <span class="st">'SOFTWARE'</span>, <span class="st">'SPLTYRET'</span>, <span class="st">'SPTYCHEM'</span>, <span class="st">'SPTYSTOR'</span>, <span class="st">'TELECOM'</span>, </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="st">'TRADECO'</span>, <span class="st">'TRANSPRT'</span>, <span class="st">'WIRELESS'</span>]</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>style_factors <span class="op">=</span> [<span class="st">'BETA'</span>, <span class="st">'SIZE'</span>, <span class="st">'MOMENTUM'</span>, <span class="st">'VALUE'</span>]</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_formula(alpha):</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> [<span class="st">"0"</span>, alpha]</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    L.extend(style_factors)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    L.extend(industry_factors)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Ret ~ "</span> <span class="op">+</span> <span class="st">" + "</span>.join(L)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_estu(df):</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Estimation universe definition"""</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    estu <span class="op">=</span> df.loc[df.IssuerMarketCap <span class="op">&gt;</span> <span class="fl">1e9</span>].copy(deep<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> estu</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> colnames(X):</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="co">""" return names of columns, for DataFrame or DesignMatrix """</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">type</span>(X) <span class="op">==</span> patsy.design_info.DesignMatrix:</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> X.design_info.column_names</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">type</span>(X) <span class="op">==</span> pd.core.frame.DataFrame:</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> X.columns.tolist()</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> diagonal_factor_cov(date, X):</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Factor covariance matrix, ignoring off-diagonal for simplicity"""</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    cv <span class="op">=</span> covariance[date]</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> np.shape(X)[<span class="dv">1</span>]</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    Fm <span class="op">=</span> np.zeros([k,k])</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>,k):</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        fac <span class="op">=</span> colnames(X)[j]</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        Fm[j,j] <span class="op">=</span> (<span class="fl">0.01</span><span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> cv.loc[(cv.Factor1<span class="op">==</span>fac) <span class="op">&amp;</span> (cv.Factor2<span class="op">==</span>fac),<span class="st">"VarCovar"</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (Fm,k)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> risk_exposures(estu):</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Exposure matrix for risk factors, usually called X in class"""</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    L <span class="op">=</span> [<span class="st">"0"</span>]</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    L.extend(style_factors)</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    L.extend(industry_factors)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    my_formula <span class="op">=</span> <span class="st">" + "</span>.join(L)</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> patsy.dmatrix(my_formula, data <span class="op">=</span> estu)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="helpful-code-to-show-how-to-get-x-f-d-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="helpful-code-to-show-how-to-get-x-f-d-matrices">Helpful code to show how to get X, F, D matrices</h3>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>my_date <span class="op">=</span> <span class="st">'20101231'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># estu = estimation universe</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>estu <span class="op">=</span> get_estu(frames[my_date])</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>estu[<span class="st">'Ret'</span>] <span class="op">=</span> wins(estu[<span class="st">'Ret'</span>], <span class="op">-</span><span class="fl">0.25</span>, <span class="fl">0.25</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>rske <span class="op">=</span> risk_exposures(estu)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>F <span class="op">=</span> diagonal_factor_cov(my_date, rske)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> np.asarray(rske)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>D <span class="op">=</span> np.asarray( (estu[<span class="st">'SpecRisk'</span>] <span class="op">/</span> (<span class="dv">100</span> <span class="op">*</span> math.sqrt(<span class="dv">252</span>))) <span class="op">**</span> <span class="dv">2</span> )</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>kappa <span class="op">=</span> <span class="fl">1e-5</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>candidate_alphas <span class="op">=</span> [</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'STREVRSL'</span>, <span class="st">'LTREVRSL'</span>, <span class="st">'INDMOM'</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">'EARNQLTY'</span>, <span class="st">'EARNYILD'</span>, <span class="st">'MGMTQLTY'</span>, <span class="st">'PROFIT'</span>, <span class="st">'SEASON'</span>, <span class="st">'SENTMT'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="problem-0" class="level3">
+<h3 class="anchored" data-anchor-id="problem-0">problem 0</h3>
+<p>All of the below pertain to the estimation universe as defined above. Modify the daily data frames, removing all non-estimation-universe rows, before continuing.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># updated frames dataset for the new estu universe</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> date <span class="kw">in</span> frames:</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    frames[date] <span class="op">=</span> get_estu(frames[date])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="problem-1.-residual-returns" class="level3">
+<h3 class="anchored" data-anchor-id="problem-1.-residual-returns">Problem 1. Residual Returns</h3>
+<p>Within each daily data frame, let <span class="math inline">\(Y\)</span> denote the residuals of the variable <code>Ret</code>, with respect to the risk model. In other words, define</p>
+<p><span class="math display">\[ Y := \text{Ret} - XX^+\text{Ret} \]</span></p>
+<p>where <span class="math inline">\(X^+\)</span> denotes the pseudoinverse, and <span class="math inline">\(X\)</span> is constructed as above (i.e., using the <code>risk_exposures</code> function). Augment the data frames you have been given, by adding a new column, <span class="math inline">\(Y\)</span>, to each frame. Be sure to winsorize the <code>Ret</code> column prior to computing <span class="math inline">\(Y\)</span> as above. You do not have to save the augmented data, unless you want to. In other words, the modification that adds column <span class="math inline">\(Y\)</span> can be done in-memory.</p>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pseudoinverse function</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pinv(A):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute SVD of the matrix</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    U, s, Vt <span class="op">=</span> np.linalg.svd(A,full_matrices<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Step 2: Create the pseudoinverse of the diagonal matrix Sigma</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    s_pinv <span class="op">=</span> np.zeros(s.shape) <span class="co"># creating an empty matrix to store invesed diagonals in</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(s)):</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> s[i] <span class="op">!=</span> <span class="dv">0</span>: <span class="co"># Consider only diagonals</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            s_pinv[i] <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> s[i] <span class="co"># inverse the diagonals </span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the pseudoinverse of A using the formula from equation 2 listed above</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    A_pinv <span class="op">=</span> Vt.T <span class="op">@</span> np.diag(s_pinv) <span class="op">@</span> U.T</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_pinv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> date <span class="kw">in</span> frames:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Winsorize the 'Ret' column</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    frames[date][<span class="st">'Ret'</span>] <span class="op">=</span> wins(frames[date][<span class="st">'Ret'</span>], <span class="op">-</span><span class="fl">0.25</span>, <span class="fl">0.25</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the Risk Exposure Matrix (X)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    estu <span class="op">=</span> get_estu(frames[date])</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    rske <span class="op">=</span> risk_exposures(estu)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.asarray(rske)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Compute the Pseudoinverse (X^+)</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    X_pinv <span class="op">=</span> pinv(X)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate Residuals (Y)</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    Y <span class="op">=</span> estu[<span class="st">'Ret'</span>] <span class="op">-</span> np.matmul(X, np.matmul(X_pinv, estu[<span class="st">'Ret'</span>]))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Augment the Data Frames with the calculated Y</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    estu[<span class="st">'Y'</span>] <span class="op">=</span> Y</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update the frame in the dictionary</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    frames[date] <span class="op">=</span> estu</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="problem-2.-model-selection" class="level3">
+<h3 class="anchored" data-anchor-id="problem-2.-model-selection">Problem 2. Model Selection</h3>
+<p>Split your data into a training/validation set <span class="math inline">\(D_{\text{train}}\)</span>, and an ultimate test set (vault), <span class="math inline">\(D_{\text{test}}\)</span>. Do not split within a single day; rather, some dates end up in <span class="math inline">\(D_{\text{train}}\)</span> and the rest in <span class="math inline">\(D_{\text{test}}\)</span>. This will be the basis of your cross-validation study later on.</p>
+<p>It will be helpful to join together vertically the frames in the training/validation set <span class="math inline">\(D_{\text{train}}\)</span> into a single frame called a panel. For the avoidance of doubt, the panel will have the same columns as any one of the daily frames individually, and the panel will have a large number of rows (the sum of all the rows of all the frames in <span class="math inline">\(D_{\text{train}}\)</span>).</p>
+<p>Consider the list of candidate alpha factors given above. Find a model of the form <span class="math inline">\(Y = f(\text{candidate alphas}) + \epsilon\)</span> where <span class="math inline">\(Y\)</span> is the residual return from above. Determine the function <span class="math inline">\(f()\)</span> using cross-validation to optimize any tunable hyper-parameters. First, to get started, assume <span class="math inline">\(f\)</span> is linear and use lasso or elastic net cross-validation tools (e.g., from sklearn). Then, get creative and try at least one non-linear functional form for <span class="math inline">\(f\)</span>, again using cross-validation to optimize any tunable hyper-parameters.</p>
+</section>
+</section>
+<section id="part-1" class="level2">
+<h2 class="anchored" data-anchor-id="part-1">Part 1</h2>
+<div class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> create_panel_data(frames, split_ratio<span class="op">=</span><span class="fl">0.8</span>):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Splits the data into training and test sets and creates panel data for each.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    - frames: Dictionary with dates as keys and data frames as values.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">    - split_ratio: Float representing the percentage of data to be used for training.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">    - train_panel: Panel data for training set.</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">    - test_panel: Panel data for test set.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sort the dates to ensure chronological splitting</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    sorted_dates <span class="op">=</span> <span class="bu">sorted</span>(frames.keys())</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate the index to split the data</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    split_index <span class="op">=</span> <span class="bu">int</span>(split_ratio <span class="op">*</span> <span class="bu">len</span>(sorted_dates))</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Split the dates into training and testing</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    train_dates <span class="op">=</span> sorted_dates[:split_index]</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    test_dates <span class="op">=</span> sorted_dates[split_index:]</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract frames for training and testing</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    train_frames <span class="op">=</span> {date: frames[date] <span class="cf">for</span> date <span class="kw">in</span> train_dates}</span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    test_frames <span class="op">=</span> {date: frames[date] <span class="cf">for</span> date <span class="kw">in</span> test_dates}</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Concatenate the frames vertically to create panels</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    train_panel <span class="op">=</span> pd.concat(train_frames.values())</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    test_panel <span class="op">=</span> pd.concat(test_frames.values())</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> train_panel, test_panel</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Usage example</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>train_panel, test_panel <span class="op">=</span> create_panel_data(frames, split_ratio<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> train_panel[<span class="st">"Y"</span>]</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> train_panel[candidate_alphas]</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>X_test <span class="op">=</span> test_panel[candidate_alphas]</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>Y_test <span class="op">=</span> test_panel[<span class="st">"Y"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Shape of X:"</span>, x.shape)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Shape of Y:"</span>, Y.shape)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Shape of X: (3955790, 9)
+Shape of Y: (3955790,)</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_candidate_alpha_coefficients_from_model(model_coef, candidate_alphas):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Extracts coefficients of candidate alphas from a given model.</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters:</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">    model_coef (pd.Series): Coefficients from the model.</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">    candidate_alphas (list): List of candidate alpha factors.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">    pd.Series: Coefficients for candidate alphas.</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> model_coef[candidate_alphas]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="model-1-lasso" class="level1">
+<h1>Model 1 lasso</h1>
+<div class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LassoCV, ElasticNetCV</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># create a LassoCV model</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>num_alphas <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>lasso <span class="op">=</span> LassoCV(n_alphas<span class="op">=</span>num_alphas, cv<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model based on the data</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>lasso.fit(x, Y)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Best alpha for Lasso</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>best_alpha_lasso <span class="op">=</span> lasso.alpha_</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best alpha for Lasso:"</span>, best_alpha_lasso)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>coef <span class="op">=</span> pd.Series(lasso.coef_, index <span class="op">=</span> x.columns)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>lasso_candidate_alpha_coefs <span class="op">=</span> get_candidate_alpha_coefficients_from_model(coef, candidate_alphas)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Print out alpha factors variables picked by Lasso</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>selected_alphas_lasso <span class="op">=</span> lasso_candidate_alpha_coefs[lasso_candidate_alpha_coefs <span class="op">!=</span> <span class="dv">0</span>].sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Alpha factors variables picked by Lasso:"</span>)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(selected_alphas_lasso)</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict using the Lasso model</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>Y_pred <span class="op">=</span> lasso.predict(X_test)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate RMSE</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>rmse <span class="op">=</span> np.sqrt(mean_squared_error(Y_test, Y_pred))</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"the rmse score is </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>rmse<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best alpha for Lasso: 1.1233678141770053e-05
+Alpha factors variables picked by Lasso:
+STREVRSL    0.000340
+INDMOM      0.000107
+SENTMT      0.000067
+SEASON      0.000061
+EARNYILD    0.000041
+PROFIT      0.000037
+MGMTQLTY    0.000026
+dtype: float64
+the rmse score is 
+ 0.019451631137723656</code></pre>
+</div>
+</div>
+</section>
+<section id="model-2-elasticnet" class="level1">
+<h1>model 2 ElasticNet</h1>
+<div class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a ElasticNetCV model</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>l1_space <span class="op">=</span> np.linspace(<span class="fl">0.01</span>, <span class="dv">1</span>, <span class="dv">30</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>elastic_net <span class="op">=</span> ElasticNetCV(l1_ratio<span class="op">=</span>l1_space, cv<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fit the model based on the data</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>elastic_net.fit(x, Y)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>coef <span class="op">=</span> pd.Series(elastic_net.coef_, index <span class="op">=</span> x.columns)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Best alpha and l1_ratio for Elastic Net</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>best_alpha_elastic_net <span class="op">=</span> elastic_net.alpha_</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>best_l1_ratio_elastic_net <span class="op">=</span> elastic_net.l1_ratio_</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best alpha for Elastic Net:"</span>, best_alpha_elastic_net)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best l1_ratio for Elastic Net:"</span>, best_l1_ratio_elastic_net)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Coefficients for the best Elastic Net model</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>elastic_net_coef <span class="op">=</span> pd.Series(elastic_net.coef_, index <span class="op">=</span> x.columns)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>elastic_net_candidate_alpha_coefs <span class="op">=</span> get_candidate_alpha_coefficients_from_model(elastic_net_coef, candidate_alphas)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Coefficients for the best Elastic Net model:"</span>)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(elastic_net_candidate_alpha_coefs)</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Print out alpha factors variables picked by ElasticNet</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>selected_alphas_elastic_net <span class="op">=</span> elastic_net_candidate_alpha_coefs[elastic_net_candidate_alpha_coefs <span class="op">!=</span> <span class="dv">0</span>].sort_values(ascending <span class="op">=</span> <span class="va">False</span>)</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Alpha factors variables picked by ElasticNet:"</span>)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(selected_alphas_elastic_net)</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>Y_pred_elastic_net <span class="op">=</span> elastic_net.predict(X_test)</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>rmse_elastic_net <span class="op">=</span> np.sqrt(mean_squared_error(Y_test, Y_pred_elastic_net))</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>rmse_elastic_net</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best alpha for Elastic Net: 0.0011128252534198637
+Best l1_ratio for Elastic Net: 0.01
+Coefficients for the best Elastic Net model:
+STREVRSL    0.000340
+LTREVRSL   -0.000000
+INDMOM      0.000107
+EARNQLTY    0.000000
+EARNYILD    0.000041
+MGMTQLTY    0.000026
+PROFIT      0.000037
+SEASON      0.000061
+SENTMT      0.000067
+dtype: float64
+Alpha factors variables picked by ElasticNet:
+STREVRSL    0.000340
+INDMOM      0.000107
+SENTMT      0.000067
+SEASON      0.000061
+EARNYILD    0.000041
+PROFIT      0.000037
+MGMTQLTY    0.000026
+dtype: float64</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>0.019451631909229154</code></pre>
+</div>
+</div>
+</section>
+<section id="model-3---hypertuned-xgboost" class="level1">
+<h1>model 3 - Hypertuned XGBOOST</h1>
+<div class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> xgboost <span class="im">as</span> xgb</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shap</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the parameter grid for XGBoost</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">'learning_rate'</span>: [<span class="fl">0.01</span>, <span class="fl">0.1</span>],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'n_estimators'</span>: [<span class="dv">100</span>, <span class="dv">200</span>],</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'max_depth'</span>: [<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>]</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Initialize the XGBoost regressor</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>xgb_model <span class="op">=</span> xgb.XGBRegressor()</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Create GridSearchCV</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>grid_search <span class="op">=</span> GridSearchCV(estimator<span class="op">=</span>xgb_model, param_grid<span class="op">=</span>param_grid, cv<span class="op">=</span><span class="dv">3</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the grid search to the data</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>grid_search.fit(x, Y)  <span class="co"># Replace X_train, Y_train with your data</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a><span class="co"># The best hyperparameters from GridSearchCV</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Best Parameters:"</span>, grid_search.best_params_)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the XGBoost model using the best parameters</span></span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>best_xgb_model <span class="op">=</span> xgb.XGBRegressor(<span class="op">**</span>best_params)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>best_xgb_model.fit(x, Y)  <span class="co"># Replace X_train, Y_train with your data</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Predict using the XGBoost model</span></span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>Y_pred_xgb <span class="op">=</span> best_xgb_model.predict(X_test)  <span class="co"># Replace X_test with your test data</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate RMSE for XGBoost</span></span>
+<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a>rmse_xgb <span class="op">=</span> np.sqrt(mean_squared_error(Y_test, Y_pred_xgb))  <span class="co"># Replace Y_test with your test data</span></span>
+<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"the RMSE score of the XGBoost model is: </span><span class="ch">\n</span><span class="ss"> </span><span class="sc">{</span>rmse_xgb<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a>explainer <span class="op">=</span> shap.TreeExplainer(best_xgb_model)</span>
+<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>shap_values <span class="op">=</span> explainer.shap_values(X_test)  <span class="co"># Replace X_test with a small subset of your test data</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>shap.summary_plot(shap_values, X_test, plot_type<span class="op">=</span><span class="st">"bar"</span>)  <span class="co"># Replace X_test with the same subset of your test data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+[01:15:44] WARNING: /Users/runner/work/xgboost/xgboost/src/c_api/c_api.cc:1240: Saving into deprecated binary model format, please consider using `json` or `ubj`. Model format will default to JSON in XGBoost 2.2 if not specified.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best Parameters: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 200}
+the RMSE score of the XGBoost model is: 
+ 0.019451616311665722</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="optimisation_files/figure-html/cell-14-output-3.png" width="757" height="479"></p>
+</div>
+</div>
+<section id="problem-3.-efficient-portfolio-optimization" class="level3">
+<h3 class="anchored" data-anchor-id="problem-3.-efficient-portfolio-optimization">Problem 3. Efficient Portfolio Optimization</h3>
+<p>Code up the efficient formula for portfolio optimization discussed in lecture, based on the Woodbury matrix inversion lemma.</p>
+</section>
+<section id="markowitz-model-mathematical-foundation" class="level2">
+<h2 class="anchored" data-anchor-id="markowitz-model-mathematical-foundation">Markowitz Model: Mathematical Foundation</h2>
+<section id="objective" class="level3">
+<h3 class="anchored" data-anchor-id="objective">Objective</h3>
+<p>The goal is to construct a portfolio that offers the maximum expected return for a given level of risk or the minimum risk for a given level of expected return.</p>
+</section>
+<section id="variables" class="level3">
+<h3 class="anchored" data-anchor-id="variables">Variables</h3>
+<ul>
+<li><strong><span class="math inline">\(h\)</span></strong>: Vector of portfolio weights.</li>
+<li><strong><span class="math inline">\(r\)</span></strong>: Vector of expected asset returns.</li>
+<li><strong><span class="math inline">\(\Omega\)</span></strong>: Covariance matrix of asset returns.</li>
+</ul>
+</section>
+<section id="expected-portfolio-return" class="level3">
+<h3 class="anchored" data-anchor-id="expected-portfolio-return">Expected Portfolio Return</h3>
+<ul>
+<li><strong><span class="math inline">\(E[h' r]\)</span></strong>, where <strong><span class="math inline">\(h'\)</span></strong> denotes the transpose of <strong><span class="math inline">\(h\)</span></strong>.</li>
+</ul>
+</section>
+<section id="portfolio-variance-risk" class="level3">
+<h3 class="anchored" data-anchor-id="portfolio-variance-risk">Portfolio Variance (Risk)</h3>
+<ul>
+<li><strong><span class="math inline">\(h' \Omega h\)</span></strong>.</li>
+</ul>
+</section>
+<section id="optimization-problem" class="level3">
+<h3 class="anchored" data-anchor-id="optimization-problem">Optimization Problem</h3>
+<p>Maximize <strong><span class="math inline">\(E[h' r] - \frac{1}{2\kappa} h' \Omega h\)</span></strong>, where <strong><span class="math inline">\(\kappa\)</span></strong> is a risk-aversion parameter. This form assumes a quadratic utility function which represents the trade-off between risk and return.</p>
+</section>
+<section id="solution" class="level3">
+<h3 class="anchored" data-anchor-id="solution">Solution</h3>
+<p>Under the assumption that <strong><span class="math inline">\(\Omega\)</span></strong> is invertible, the optimal portfolio weights <strong><span class="math inline">\(h^*\)</span></strong> can be found as <strong><span class="math inline">\(h^* = \frac{1}{\kappa} \Omega^{-1} E[r]\)</span></strong>.</p>
+</section>
+<section id="mean-variance-formulation" class="level3">
+<h3 class="anchored" data-anchor-id="mean-variance-formulation">Mean-Variance Formulation</h3>
+<p>The problem simplifies to <strong>Maximize over <span class="math inline">\(h\)</span>: <span class="math inline">\(h' E[r] - \frac{1}{2\kappa} h' \Omega h\)</span></strong>.</p>
+</section>
+</section>
+<section id="woodbury-matrix-inversion-lemma" class="level2">
+<h2 class="anchored" data-anchor-id="woodbury-matrix-inversion-lemma">Woodbury Matrix Inversion Lemma</h2>
+<p>This lemma provides an efficient way to compute the inverse of a matrix that has been modified by a rank-k update. The formula is:</p>
+<p><strong><span class="math inline">\((A + UCV)^{-1} = A^{-1} - A^{-1} U (C^{-1} + VA^{-1} U)^{-1} VA^{-1}\)</span></strong></p>
+<p>Where: - <strong><span class="math inline">\(A\)</span></strong> is a square matrix. - <strong><span class="math inline">\(U, C, V\)</span></strong> are matrices of appropriate dimensions.</p>
+</section>
+<section id="application-in-portfolio-optimization" class="level2">
+<h2 class="anchored" data-anchor-id="application-in-portfolio-optimization">Application in Portfolio Optimization</h2>
+<p>Applying the Woodbury lemma to the covariance matrix in the Markowitz model can significantly speed up computations, especially for large portfolios.</p>
+<section id="in-the-portfolio-context" class="level3">
+<h3 class="anchored" data-anchor-id="in-the-portfolio-context">In the Portfolio Context</h3>
+<ul>
+<li>Let <strong><span class="math inline">\(A = D\)</span></strong>, <strong><span class="math inline">\(U = X\)</span></strong>, <strong><span class="math inline">\(V = X'\)</span></strong>, and <strong><span class="math inline">\(C = F\)</span></strong> in the Woodbury lemma.</li>
+<li><strong><span class="math inline">\(D\)</span></strong> represents a diagonal matrix (typically of variances), <strong><span class="math inline">\(X\)</span></strong> is a factor loading matrix, and <strong><span class="math inline">\(F\)</span></strong> is the covariance matrix of factors.</li>
+</ul>
+</section>
+<section id="efficient-inverse-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="efficient-inverse-calculation">Efficient Inverse Calculation</h3>
+<p>By using the Woodbury lemma, one can efficiently compute <strong><span class="math inline">\(\Omega^{-1}\)</span></strong>, which is crucial for determining the optimal portfolio weights in the Markowitz model.</p>
+<div class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.optimize</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Woodbury Matrix Inversion Lemma Function</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> woodbury_inverse(A, U, C, V):</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    A_inv <span class="op">=</span> np.linalg.inv(A)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> np.linalg.inv(C <span class="op">+</span> V <span class="op">@</span> A_inv <span class="op">@</span> U)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> A_inv <span class="op">-</span> A_inv <span class="op">@</span> U <span class="op">@</span> M <span class="op">@</span> V <span class="op">@</span> A_inv</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Portfolio Optimization Function</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> optimize_portfolio(date, frames, covariance, kappa, alpha_factors):</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    estu <span class="op">=</span> get_estu(frames[date])</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> estu.shape[<span class="dv">0</span>]</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(f"Number of assets in EstU: {n}")</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    estu[<span class="st">'Ret'</span>] <span class="op">=</span> wins(estu[<span class="st">'Ret'</span>], <span class="op">-</span><span class="fl">0.25</span>, <span class="fl">0.25</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Combine alpha factors into a single alpha score</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    estu[<span class="st">'alpha'</span>] <span class="op">=</span> <span class="bu">sum</span>([estu[factor] <span class="op">*</span> coefficient <span class="cf">for</span> factor, coefficient <span class="kw">in</span> alpha_factors.items()])</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    estu_alpha <span class="op">=</span> estu[<span class="st">'alpha'</span>].to_numpy()</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Risk exposures and factor covariance</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    rske <span class="op">=</span> risk_exposures(estu)</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># print(f"Dimension of risk exposures (rske): {rske.shape}")</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    Fm,k <span class="op">=</span> diagonal_factor_cov(date, rske)</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    A <span class="op">=</span> np.diag(np.diag(Fm))</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    U <span class="op">=</span> Fm <span class="op">-</span> A</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    V <span class="op">=</span> U.T</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>    C <span class="op">=</span> np.eye(k)</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    F <span class="op">=</span> woodbury_inverse(A,U,C,V)</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    X <span class="op">=</span> np.asarray(rske)</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> np.asarray((estu[<span class="st">'SpecRisk'</span>] <span class="op">/</span> (<span class="dv">100</span> <span class="op">*</span> math.sqrt(<span class="dv">252</span>))) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Optimization objective function</span></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> fun(h): </span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>        x <span class="op">=</span> X.T <span class="op">@</span> h</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>        obj <span class="op">=</span> <span class="op">-</span>np.dot(h, estu_alpha) <span class="op">+</span> <span class="fl">0.5</span> <span class="op">*</span> kappa <span class="op">*</span> (np.dot(x, F <span class="op">@</span> x) <span class="op">+</span> np.dot(h <span class="op">**</span> <span class="dv">2</span>, D))</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> obj</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Gradient of the objective function</span></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> grad_f(h): </span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="op">-</span>estu_alpha <span class="op">+</span> kappa <span class="op">*</span> (X <span class="op">@</span> (F <span class="op">@</span> (X.T <span class="op">@</span> h)) <span class="op">+</span> D <span class="op">*</span> h)</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Optimization using L-BFGS-B algorithm</span></span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>    optimizer_result <span class="op">=</span> scipy.optimize.fmin_l_bfgs_b(fun, np.zeros(n), fprime<span class="op">=</span>grad_f)</span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> optimizer_result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="problem-4.-putting-it-all-together" class="level3">
+<h3 class="anchored" data-anchor-id="problem-4.-putting-it-all-together">Problem 4. Putting it All Together</h3>
+<p>Using the helpful code example above, and using the output of the function <span class="math inline">\(f\)</span> as your final alpha factor, construct a backtest of a portfolio optimization strategy. In other words, compute the optimal portfolio each day, and dot product it with <code>Ret</code> to get the pre-tcost 1-day profit for each day. Use the previous problem to speed things up. Create time-series plots of the long market value, short market value, and cumulative profit of this portfolio sequence. Also plot the daily risk, in dollars, of your portfolios and the percent of the risk that is idiosyncratic.</p>
+<div class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Your existing code with modifications for risk calculations and direct ls_ratio calculation</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>cumulative_profit <span class="op">=</span> []</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>long_market_value <span class="op">=</span> []</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>short_market_value <span class="op">=</span> []</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>daily_risk <span class="op">=</span> []</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>idiosyncratic_risk_percent <span class="op">=</span> []</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>ls_ratio_list <span class="op">=</span> []  <span class="co"># To store the long-short ratio</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> date <span class="kw">in</span> <span class="bu">sorted</span>(frames.keys()):</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    optimal_portfolio <span class="op">=</span> optimize_portfolio(date, frames, covariance, kappa, selected_alphas_lasso)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    optimal_portfolio <span class="op">=</span> optimal_portfolio[<span class="dv">0</span>] <span class="op">/</span> <span class="bu">sum</span>(np.<span class="bu">abs</span>(optimal_portfolio[<span class="dv">0</span>]))</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate portfolio metrics</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    daily_return <span class="op">=</span> optimal_portfolio <span class="op">@</span> frames[date][<span class="st">'Ret'</span>]</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    cumulative_profit.append(daily_return)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    long_mv <span class="op">=</span> np.<span class="bu">sum</span>(optimal_portfolio[optimal_portfolio <span class="op">&gt;</span> <span class="dv">0</span>])</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    short_mv <span class="op">=</span> np.<span class="bu">sum</span>(optimal_portfolio[optimal_portfolio <span class="op">&lt;</span> <span class="dv">0</span>])</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    long_market_value.append(long_mv)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    short_market_value.append(short_mv)</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate long-short ratio directly in the loop</span></span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>    ls_ratio <span class="op">=</span> np.<span class="bu">abs</span>(long_mv <span class="op">/</span> short_mv) <span class="cf">if</span> short_mv <span class="op">!=</span> <span class="dv">0</span> <span class="cf">else</span> np.inf</span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>    ls_ratio_list.append(ls_ratio)</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Total risk and idiosyncratic risk calculations</span></span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>    total_risk <span class="op">=</span> np.<span class="bu">abs</span>(optimal_portfolio) <span class="op">@</span> (frames[date][<span class="st">'TotalRisk'</span>] <span class="op">/</span> (<span class="dv">100</span> <span class="op">*</span> math.sqrt(<span class="dv">252</span>)))</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>    idio_risk <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> (np.<span class="bu">abs</span>(optimal_portfolio) <span class="op">@</span> (frames[date][<span class="st">'SpecRisk'</span>] <span class="op">/</span> (<span class="dv">100</span> <span class="op">*</span> math.sqrt(<span class="dv">252</span>)))) <span class="op">/</span> total_risk</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>    daily_risk.append(total_risk)</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a>    idiosyncratic_risk_percent.append(idio_risk <span class="op">*</span> <span class="dv">100</span>)  <span class="co"># Convert to percentage</span></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert lists to time series</span></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a>date_index <span class="op">=</span> pd.to_datetime(<span class="bu">sorted</span>(frames.keys()))</span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>cumulative_profit_ts <span class="op">=</span> pd.Series(cumulative_profit, index<span class="op">=</span>date_index).cumsum()</span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>long_market_value_ts <span class="op">=</span> pd.Series(long_market_value, index<span class="op">=</span>date_index)</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>short_market_value_ts <span class="op">=</span> pd.Series(short_market_value, index<span class="op">=</span>date_index)</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>daily_risk_ts <span class="op">=</span> pd.Series(daily_risk, index<span class="op">=</span>date_index)</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>idiosyncratic_risk_percent_ts <span class="op">=</span> pd.Series(idiosyncratic_risk_percent, index<span class="op">=</span>date_index)</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>ls_ratio_ts <span class="op">=</span> pd.Series(ls_ratio_list, index<span class="op">=</span>date_index)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="daily-returns-and-market-analysis-using-optimal-weights-markowitz-theory" class="level1">
+<h1>Daily returns and Market Analysis using optimal weights (Markowitz Theory)</h1>
+<div class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine into a single DataFrame</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>result_df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Cumulative Profit'</span>: cumulative_profit_ts,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Long Market Value'</span>: long_market_value_ts,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Short Market Value'</span>: short_market_value_ts,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Daily Risk'</span>: daily_risk_ts,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Idiosyncratic Risk Percent'</span>: idiosyncratic_risk_percent_ts,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">'LS Ratio'</span>: ls_ratio_ts</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>}, index<span class="op">=</span>date_index)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>result_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Cumulative Profit</th>
+<th data-quarto-table-cell-role="th">Long Market Value</th>
+<th data-quarto-table-cell-role="th">Short Market Value</th>
+<th data-quarto-table-cell-role="th">Daily Risk</th>
+<th data-quarto-table-cell-role="th">Idiosyncratic Risk Percent</th>
+<th data-quarto-table-cell-role="th">LS Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2003-01-02</td>
+<td>-0.000330</td>
+<td>0.501335</td>
+<td>-0.498665</td>
+<td>0.023709</td>
+<td>30.372889</td>
+<td>1.005355</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2003-01-03</td>
+<td>0.002805</td>
+<td>0.501521</td>
+<td>-0.498479</td>
+<td>0.024614</td>
+<td>27.845298</td>
+<td>1.006101</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2003-01-06</td>
+<td>0.004425</td>
+<td>0.499129</td>
+<td>-0.500871</td>
+<td>0.025302</td>
+<td>28.489822</td>
+<td>0.996520</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2003-01-07</td>
+<td>0.004374</td>
+<td>0.500333</td>
+<td>-0.499667</td>
+<td>0.025602</td>
+<td>28.603909</td>
+<td>1.001335</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2003-01-08</td>
+<td>0.003961</td>
+<td>0.501308</td>
+<td>-0.498692</td>
+<td>0.025428</td>
+<td>29.079773</td>
+<td>1.005244</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-12-27</td>
+<td>0.942190</td>
+<td>0.499911</td>
+<td>-0.500089</td>
+<td>0.019602</td>
+<td>23.197892</td>
+<td>0.999644</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-12-28</td>
+<td>0.943419</td>
+<td>0.501309</td>
+<td>-0.498691</td>
+<td>0.018910</td>
+<td>24.076420</td>
+<td>1.005248</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-12-29</td>
+<td>0.944268</td>
+<td>0.502189</td>
+<td>-0.497811</td>
+<td>0.018345</td>
+<td>24.562678</td>
+<td>1.008793</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-12-30</td>
+<td>0.944304</td>
+<td>0.501774</td>
+<td>-0.498226</td>
+<td>0.017801</td>
+<td>25.325438</td>
+<td>1.007123</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-12-31</td>
+<td>0.946676</td>
+<td>0.500637</td>
+<td>-0.499363</td>
+<td>0.017313</td>
+<td>26.311766</td>
+<td>1.002553</td>
+</tr>
+</tbody>
+</table>
+
+<p>2015 rows × 6 columns</p>
+</div>
+</div>
+</div>
+<section id="plotting-the-daily-returns-and-market-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="plotting-the-daily-returns-and-market-analysis">Plotting the daily returns and Market Analysis</h2>
+<div class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(result_df, index<span class="op">=</span>date_index)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">10</span>))</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for Cumulative Profit</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'Cumulative Profit'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Cumulative Profit'</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Profit'</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for Long Market Value</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'Long Market Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'green'</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Long Market Value'</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Value'</span>)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for Short Market Value</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'Short Market Value'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Short Market Value'</span>)</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Value'</span>)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for Daily Risk</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">4</span>)</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'Daily Risk'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'purple'</span>)</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Daily Risk'</span>)</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Risk'</span>)</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for Idiosyncratic Risk Percent</span></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">5</span>)</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'Idiosyncratic Risk Percent'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Idiosyncratic Risk Percent'</span>)</span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Percent'</span>)</span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a><span class="co"># Subplot for LS Ratio</span></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>plt.subplot(<span class="dv">3</span>, <span class="dv">2</span>, <span class="dv">6</span>)</span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>plt.plot(df[<span class="st">'LS Ratio'</span>], marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'brown'</span>)</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'LS Ratio'</span>)</span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Ratio'</span>)</span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust layout</span></span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<p><img src="optimisation_files/figure-html/cell-18-output-1.png" width="1439" height="950"></p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

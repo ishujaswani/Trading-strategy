@@ -1,0 +1,38 @@
+- x do we need to inclue industry factors and style factors while calculating the returns??
+  - yes we have to use 
+- Yet have to hypertune parameters
+- we have to do daily optimisation of portfolio
+- in the end just take the alpha factors. 
+
+
+
+incorporate style_factors and indutry_factors into the model. Use the function `get_formula` to do so. then build lasso and elasticnet 5 fold cv to select the best variables.
+
+then hypertune multiple params of the linear model.
+
+
+code a non-linear model to get alpha's. hypertune the non-linear model. perfome 5 fold cv on it.
+
+test all models on the test data. 
+
+model 1 
+- linear model ols w lasso get_formula(candidate_alpha) (cv = 5)
+- hypertune
+- test on test data get accuracy
+
+model 2
+- linear model ols w elastic get_formula(candidate_alpha) (cv = 5)
+- hypertune
+- test on test data get accuracy
+
+model 3 ()
+- non-linear model get_formula(candidate_alpha) (cv = 5)
+- hypertune
+- test on test data get accuracy
+
+What does the best model inclue:
+1. top parameters
+2. best RMSE from test
+3. best alpha ()
+
+- 

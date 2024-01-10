@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Trading"
+  navbar:
+    left:
+      - href: about.qmd
+        text: About
+      - href: index.qmd
+        text: Data Cleaning
+      - href: optimisation.qmd 
+        text: Optimisation
+    search: True
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://code.com
+          - text: Report a Bug
+            url:  https://bugs.com
+
+
+format:
+  html:
+    theme: lux
+    css: styles.css
+    toc: true
+
+
+

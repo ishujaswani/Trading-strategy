@@ -1,2 +1,4 @@
-# Trading-Stratergy
-Develop a trading strategy using Arbitrage Pricing Theory (APT) factors and portfolio optimization, incorporating transaction costs. Use a computationally efficient backtester for fast results. Perform performance attribution to identify key return drivers.
+# Trading Strategy 
+
+This project focuses on advanced trading analysis, emphasizing meticulous data cleaning, robust optimization methods, and strategic portfolio management. Our aim is to use statistical and machine learning techniques to refine trading strategies, enhance risk management, and guide investment decisions effectively.
+
